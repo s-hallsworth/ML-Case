@@ -51,7 +51,7 @@ def plot_scatters(df, n_cols,target):
     axs = axs.flatten()
 
     # For each colum
-    for i, column in enumerate(df.drop(target).columns):
+    for i, column in enumerate(df.columns):
         df.plot.scatter(x=column, y=target, ax=axs[i])
         axs[i].set_title(f"Scatterplot of {column}")
     
