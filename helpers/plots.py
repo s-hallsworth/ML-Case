@@ -62,7 +62,7 @@ def plot_histograms_percent(df, n_cols, target):
         
         # Compute histogram with percentages
         sns.histplot(data=df, x=column, hue=target, ax=axs[i], bins=30, 
-                     multiple="fill", kde=False, palette="bright", stat="percent")
+                     multiple="fill", kde=False, stat="percent")
         axs[i].set_title(f"Percentage Histogram of {column} (colored by {target})")
         axs[i].set_ylabel("Percentage (%)")
         axs[i].set_xlabel(column)
