@@ -7,7 +7,6 @@ import torch
 import torch.nn.functional as F
 from torch import optim
 
-
 def pair(t):
     return t if isinstance(t, tuple) else (t, t)
 
@@ -50,7 +49,7 @@ class Attention(nn.Module):
         self.heads = heads
         self.scale = dim_head ** -0.5
 
-        self.attend = nn.Softmax(dim = -1)#Log_softmax(dim=-1) #nn.Softmax(dim = -1)
+        self.attend = Log_softmax(dim=-1)
         self.to_qkv = nn.Linear(dim, inner_dim * 3, bias = False)
 
         self.to_out = nn.Sequential(
@@ -103,6 +102,7 @@ class transformer_model(nn.Module):
         )
 
     def forward(self, x):
+        x = x.unsqueeze(1)
         x = self.embed(x)
         b, n, _ = x.shape
         cls_tokens = repeat(self.cls_token, '() n d -> b n d', b = b)
@@ -133,16 +133,19 @@ def train_epoch(model, optimizer, data_loader, loss_history, accuracy_history):
         correct_samples += pred.eq(target).sum().item()
         total_loss += loss.item()
 
-        if i % 100 == 0:
-            print('[' +  '{:5}'.format(i * len(data)) + '/' + '{:5}'.format(total_samples) +
-                ' (' + '{:3.0f}'.format(100 * i / len(data_loader)) + '%)]  Loss: ' +
-                '{:6.4f}'.format(loss.item()))
-            loss_history.append(loss.item())
+        # if i % 100 == 0:
+            # print('[' +  '{:5}'.format(i * len(data)) + '/' + '{:5}'.format(total_samples) +
+            #     ' (' + '{:3.0f}'.format(100 * i / len(data_loader)) + '%)]  Loss: ' +
+            #     '{:6.4f}'.format(loss.item()))
+            
 
     avg_loss = total_loss / total_samples
     accuracy = 100.0 * correct_samples / total_samples
     accuracy_history.append(accuracy)
-    print(f'Avg train loss: {avg_loss:.4f}  Train Accuracy: {accuracy:.2f}%')
+    loss_history.append(avg_loss)
+    print(f'Avg Train Loss: {avg_loss:.4f}  Train Accuracy: {accuracy:.2f}%')
+    
+    return  loss_history, accuracy_history
 
 def evaluate(model, data_loader, loss_history, accuracy_history):
     model.eval()
@@ -165,5 +168,5 @@ def evaluate(model, data_loader, loss_history, accuracy_history):
     loss_history.append(avg_loss)
     accuracy_history.append(accuracy)
 
-    print('\nAverage test loss: {:.4f}  Accuracy: {:.2f}%\n'.format(avg_loss, accuracy))
-    return avg_loss, accuracy
+    print('Avg Test loss: {:.4f}   Test Accuracy: {:.2f}%\n'.format(avg_loss, accuracy))
+    return avg_loss, accuracy, loss_history, accuracy_history
