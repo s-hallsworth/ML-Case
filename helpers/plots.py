@@ -18,7 +18,7 @@ def plot_histograms(df, n_cols):
     # Determine number of rows needed
     num_rows = (num_features + n_cols - 1) // n_cols
     
-    fig, axs = plt.subplots(num_rows, n_cols, figsize=(20, num_rows * 5))
+    fig, axs = plt.subplots(num_rows, n_cols, figsize=(14, num_rows * 4))
     axs = axs.flatten()
 
     # Plot each feature column
